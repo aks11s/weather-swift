@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		969D3D622F6B3DD7003EB989 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 969D3D612F6B3DD7003EB989 /* Alamofire */; };
+		969D3D652F6B3DE6003EB989 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 969D3D642F6B3DE6003EB989 /* SnapKit */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		969D3CD12F6B1A65003EB989 /* weather.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = weather.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -36,6 +41,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				969D3D622F6B3DD7003EB989 /* Alamofire in Frameworks */,
+				969D3D652F6B3DE6003EB989 /* SnapKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +85,8 @@
 			);
 			name = weather;
 			packageProductDependencies = (
+				969D3D612F6B3DD7003EB989 /* Alamofire */,
+				969D3D642F6B3DE6003EB989 /* SnapKit */,
 			);
 			productName = weather;
 			productReference = 969D3CD12F6B1A65003EB989 /* weather.app */;
@@ -107,6 +116,10 @@
 			);
 			mainGroup = 969D3CC82F6B1A65003EB989;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				969D3D602F6B3DD7003EB989 /* XCRemoteSwiftPackageReference "Alamofire" */,
+				969D3D632F6B3DE6003EB989 /* XCRemoteSwiftPackageReference "SnapKit" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 969D3CD22F6B1A65003EB989 /* Products */;
 			projectDirPath = "";
@@ -149,6 +162,7 @@
 				INFOPLIST_FILE = weather/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -175,6 +189,7 @@
 				INFOPLIST_FILE = weather/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -331,6 +346,38 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		969D3D602F6B3DD7003EB989 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.11.1;
+			};
+		};
+		969D3D632F6B3DE6003EB989 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SnapKit/SnapKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.7.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		969D3D612F6B3DD7003EB989 /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 969D3D602F6B3DD7003EB989 /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
+		};
+		969D3D642F6B3DE6003EB989 /* SnapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 969D3D632F6B3DE6003EB989 /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 969D3CC92F6B1A65003EB989 /* Project object */;
 }
