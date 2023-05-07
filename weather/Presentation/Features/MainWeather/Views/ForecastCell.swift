@@ -2,9 +2,12 @@ import UIKit
 import SnapKit
 
 class ForecastCell: UICollectionViewCell {
+    // Figma: column layout, items top-to-bottom:
+    // "Wed 16" (14pt) → icon (40×40) → "22º" (16pt) → "1-5 km/h" (10pt)
+    // Color: #ECECEC per Figma fill_Z39B6L
+
     private let stackView = UIStackView()
-    private let dayLabel = UILabel()
-    private let dateLabel = UILabel()
+    private let dayDateLabel = UILabel()
     private let weatherIconView = UIImageView()
     private let tempLabel = UILabel()
     private let windLabel = UILabel()
@@ -19,54 +22,55 @@ class ForecastCell: UICollectionViewCell {
     }
 
     private func setupCell() {
-        contentView.backgroundColor = UIColor.gray.withAlphaComponent(0.6)
-        contentView.layer.cornerRadius = 20
-        contentView.clipsToBounds = true
+        // No individual background — shared blur container handles it
+        contentView.backgroundColor = .clear
 
         stackView.axis = .vertical
         stackView.alignment = .center
-        stackView.spacing = 8
+        stackView.spacing = 4
         contentView.addSubview(stackView)
         stackView.snp.makeConstraints { make in
-            make.edges.equalToSuperview().inset(8)
+            make.top.equalToSuperview()
+            make.centerX.equalToSuperview()
         }
 
-        dayLabel.font = UIFont.systemFont(ofSize: 14, weight: .regular)
-        dayLabel.textColor = .white
-        stackView.addArrangedSubview(dayLabel)
+        // "Wed 16" — Roboto Regular 14pt, #ECECEC
+        dayDateLabel.font = UIFont.systemFont(ofSize: 14, weight: .regular)
+        dayDateLabel.textColor = UIColor(red: 236/255, green: 236/255, blue: 236/255, alpha: 1)
+        dayDateLabel.textAlignment = .center
+        stackView.addArrangedSubview(dayDateLabel)
 
-        dateLabel.font = UIFont.systemFont(ofSize: 14, weight: .regular)
-        dateLabel.textColor = .white
-        stackView.addArrangedSubview(dateLabel)
-
-        weatherIconView.tintColor = .white
+        // Weather icon — 40×40
+        weatherIconView.tintColor = UIColor(red: 236/255, green: 236/255, blue: 236/255, alpha: 1)
         weatherIconView.contentMode = .scaleAspectFit
         stackView.addArrangedSubview(weatherIconView)
         weatherIconView.snp.makeConstraints { make in
             make.width.height.equalTo(40)
         }
 
+        // Temperature — Roboto Regular 16pt, #ECECEC
         tempLabel.font = UIFont.systemFont(ofSize: 16, weight: .regular)
-        tempLabel.textColor = .white
+        tempLabel.textColor = UIColor(red: 236/255, green: 236/255, blue: 236/255, alpha: 1)
         stackView.addArrangedSubview(tempLabel)
 
+        // Wind — Roboto Regular 10pt, 2 lines, #ECECEC
         windLabel.font = UIFont.systemFont(ofSize: 10, weight: .regular)
-        windLabel.textColor = .white
+        windLabel.textColor = UIColor(red: 236/255, green: 236/255, blue: 236/255, alpha: 1)
         windLabel.textAlignment = .center
         windLabel.numberOfLines = 2
         stackView.addArrangedSubview(windLabel)
     }
 
     func configure(with daily: DailyWeather) {
-        let dayFormatter = DateFormatter()
-        dayFormatter.dateFormat = "EEE"
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "dd"
+        let dayFmt = DateFormatter()
+        dayFmt.dateFormat = "EEE"
+        let dateFmt = DateFormatter()
+        dateFmt.dateFormat = "dd"
 
-        dayLabel.text = dayFormatter.string(from: daily.date)
-        dateLabel.text = dateFormatter.string(from: daily.date)
-        tempLabel.text = "\(daily.maxTemp)°"
-        windLabel.text = String(format: "%.1f\nkm/h", daily.maxWindSpeed)
+        // "Wed 16" on one line per Figma
+        dayDateLabel.text = "\(dayFmt.string(from: daily.date)) \(dateFmt.string(from: daily.date))"
+        tempLabel.text = "\(daily.maxTemp)º"
+        windLabel.text = String(format: "%.0f\nkm/h", daily.maxWindSpeed)
         weatherIconView.image = UIImage(systemName: daily.condition.sfSymbol)
     }
 }
