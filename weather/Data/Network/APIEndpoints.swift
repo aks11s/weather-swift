@@ -26,6 +26,7 @@ enum APIEndpoints {
             .init(name: "language", value: "en"),
             .init(name: "format",   value: "json")
         ]
+        // URL encoding handled by URLComponents automatically
         return components?.url
     }
 }
