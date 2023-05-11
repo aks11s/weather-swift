@@ -45,8 +45,9 @@ class MainCoordinator: Coordinator {
         case .present(let viewController):
             navigationController.pushViewController(viewController, animated: true)
         case .showLocations:
-            // todo: navigate to screen
-            break
+            let locationsVC = LocationsViewController()
+            locationsVC.coordinator = self
+            navigationController.pushViewController(locationsVC, animated: true)
         }
        
     }
