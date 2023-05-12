@@ -1,6 +1,6 @@
 import Foundation
 
-struct Location: Equatable {
+struct Location: Equatable, Codable {
     let id: Int
     let name: String
     let latitude: Double
