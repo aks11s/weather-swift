@@ -21,19 +21,18 @@ protocol Routing: AnyObject {
 
 class MainCoordinator: Coordinator {
 
-    
     let navigationController = UINavigationController()
-    
+
+    private let repository: WeatherRepositoryProtocol = WeatherRepository()
+    private let storage: LocationStorageProtocol = LocationStorage()
+
     func start() {
-        let mainWeatherVC = MainWeatherViewController()
-        mainWeatherVC.coordinator = self
-        navigationController.setViewControllers([mainWeatherVC], animated: false)
+        let vm = MainWeatherViewModel(repository: repository, storage: storage)
+        let mainVC = MainWeatherViewController(viewModel: vm)
+        mainVC.coordinator = self
+        navigationController.setViewControllers([mainVC], animated: false)
     }
-    
-    
-    
-    
-    
+
     func eventOccurred(with type: Event) {
         switch type {
         case .popToRoot:
@@ -45,10 +44,10 @@ class MainCoordinator: Coordinator {
         case .present(let viewController):
             navigationController.pushViewController(viewController, animated: true)
         case .showLocations:
-            let locationsVC = LocationsViewController()
+            let vm = LocationsViewModel(repository: repository, storage: storage)
+            let locationsVC = LocationsViewController(viewModel: vm)
             locationsVC.coordinator = self
             navigationController.pushViewController(locationsVC, animated: true)
         }
-       
     }
 }
