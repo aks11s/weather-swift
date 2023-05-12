@@ -7,35 +7,49 @@ class LocationsViewModel {
         didSet { stateDidChange?(state) }
     }
 
-    init() {
+    private let repository: WeatherRepositoryProtocol
+    private let storage: LocationStorageProtocol
+
+    init(
+        repository: WeatherRepositoryProtocol = WeatherRepository(),
+        storage: LocationStorageProtocol = LocationStorage()
+    ) {
+        self.repository = repository
+        self.storage = storage
         load()
     }
 
     func load() {
+        let locations = storage.load()
         state = .loading
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            self.state = .loaded(Self.mockLocations)
+
+        Task { @MainActor in
+            do {
+                // Параллельный fetch для всех локаций
+                let weathers = try await withThrowingTaskGroup(of: Weather.self) { group in
+                    for location in locations {
+                        group.addTask { try await self.repository.fetchWeather(for: location) }
+                    }
+                    var results: [Weather] = []
+                    for try await weather in group {
+                        results.append(weather)
+                    }
+                    return results
+                }
+                state = .loaded(weathers)
+            } catch {
+                state = .error(error)
+            }
         }
     }
 
-    private static let mockLocations: [Weather] = [
-        Weather(
-            city: Location(id: 1, name: "New York", latitude: 40.7128, longitude: -74.0060, country: "USA", region: "New York"),
-            current: CurrentWeather(temperature: 33, feelsLike: 31, humidity: 52, windSpeed: 15, condition: .clearSky),
-            daily: [],
-            updatedAt: Date()
-        ),
-        Weather(
-            city: Location(id: 2, name: "London", latitude: 51.5074, longitude: -0.1278, country: "UK", region: "England"),
-            current: CurrentWeather(temperature: 18, feelsLike: 16, humidity: 71, windSpeed: 20, condition: .partlyCloudy),
-            daily: [],
-            updatedAt: Date()
-        ),
-        Weather(
-            city: Location(id: 3, name: "Tokyo", latitude: 35.6762, longitude: 139.6503, country: "Japan", region: "Kanto"),
-            current: CurrentWeather(temperature: 28, feelsLike: 30, humidity: 68, windSpeed: 8, condition: .clearSky),
-            daily: [],
-            updatedAt: Date()
-        )
-    ]
+    func addLocation(_ location: Location) {
+        storage.add(location)
+        load()
+    }
+
+    func removeLocation(id: Int) {
+        storage.remove(id: id)
+        load()
+    }
 }
