@@ -12,7 +12,7 @@ class LocationStorage: LocationStorageProtocol {
     private let defaults = UserDefaults.standard
 
     private static let defaultLocations: [Location] = [
-        Location(id: 1, name: "Paris", latitude: 48.8566, longitude: 2.3522, country: "France", region: "Île-de-France")
+        Location(id: 524901, name: "Moscow", latitude: 55.7558, longitude: 37.6173, country: "Russia", region: "Moscow")
     ]
 
     func load() -> [Location] {
