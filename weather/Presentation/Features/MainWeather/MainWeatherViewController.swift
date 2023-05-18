@@ -1,9 +1,16 @@
 import UIKit
 import SnapKit
 
+enum MainWeatherMode {
+    case normal
+    case preview(location: Location, storage: LocationStorageProtocol)
+}
+
 class MainWeatherViewController: UIViewController, Routing {
     let viewModel: MainWeatherViewModel
     weak var coordinator: Coordinator?
+
+    private let mode: MainWeatherMode
 
     // MARK: - UI Components
 
@@ -46,8 +53,9 @@ class MainWeatherViewController: UIViewController, Routing {
     }()
     private let forecastCollectionView: UICollectionView
 
-    init(viewModel: MainWeatherViewModel = MainWeatherViewModel()) {
+    init(viewModel: MainWeatherViewModel = MainWeatherViewModel(), mode: MainWeatherMode = .normal) {
         self.viewModel = viewModel
+        self.mode = mode
 
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
@@ -100,11 +108,11 @@ class MainWeatherViewController: UIViewController, Routing {
         cityLabel.textColor = .white
         contentView.addSubview(cityLabel)
 
-        // Menu button
-        menuButton.setImage(UIImage(named: "icon_menu") ?? UIImage(systemName: "line.3.horizontal"), for: .normal)
+        // Menu / Add / Cancel button
         menuButton.tintColor = .white
         menuButton.addTarget(self, action: #selector(menuTapped), for: .touchUpInside)
         contentView.addSubview(menuButton)
+        configureMenuButton()
 
         // Date — Roboto Medium 40pt
         dateLabel.font = UIFont.systemFont(ofSize: 40, weight: .medium)
@@ -329,8 +337,33 @@ class MainWeatherViewController: UIViewController, Routing {
         forecastCollectionView.reloadData()
     }
 
+    private func configureMenuButton() {
+        switch mode {
+        case .normal:
+            menuButton.setImage(UIImage(named: "icon_menu") ?? UIImage(systemName: "line.3.horizontal"), for: .normal)
+            menuButton.setTitle(nil, for: .normal)
+        case .preview(let location, let storage):
+            let isSaved = storage.load().contains(where: { $0.id == location.id })
+            let title = isSaved ? "Cancel" : "Add"
+            menuButton.setImage(nil, for: .normal)
+            menuButton.setTitle(title, for: .normal)
+            menuButton.titleLabel?.font = UIFont.systemFont(ofSize: 17, weight: .medium)
+        }
+    }
+
     @objc private func menuTapped() {
-        coordinator?.eventOccurred(with: .showLocations)
+        switch mode {
+        case .normal:
+            coordinator?.eventOccurred(with: .showLocations)
+        case .preview(let location, let storage):
+            let isSaved = storage.load().contains(where: { $0.id == location.id })
+            if isSaved {
+                dismiss(animated: true)
+            } else {
+                storage.add(location)
+                configureMenuButton()
+            }
+        }
     }
 }
 
