@@ -126,6 +126,17 @@ class LocationsViewController: UIViewController, Routing {
         addButton.addSubview(addIconView)
         addButton.addSubview(addLabel)
         contentView.addSubview(addButton)
+
+        let addTap = UITapGestureRecognizer(target: self, action: #selector(addNewTapped))
+        addButton.addGestureRecognizer(addTap)
+
+        // Card taps
+        [card1, card2, card3].enumerated().forEach { index, card in
+            let tap = UITapGestureRecognizer(target: self, action: #selector(cardTapped(_:)))
+            card.tag = index
+            card.addGestureRecognizer(tap)
+            card.isUserInteractionEnabled = true
+        }
     }
 
     private func setupLayout() {
@@ -205,5 +216,18 @@ class LocationsViewController: UIViewController, Routing {
         zip(cards, locations).forEach { card, weather in
             card.configure(with: weather)
         }
+    }
+
+    @objc private func addNewTapped() {
+        coordinator?.eventOccurred(with: .showSearch)
+    }
+
+    @objc private func cardTapped(_ gesture: UITapGestureRecognizer) {
+        guard let index = gesture.view?.tag,
+              case .loaded(let weathers) = viewModel.state,
+              index < weathers.count
+        else { return }
+        let location = weathers[index].city
+        coordinator?.eventOccurred(with: .showWeatherPreview(location: location))
     }
 }

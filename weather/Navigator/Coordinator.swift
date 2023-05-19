@@ -8,6 +8,8 @@ enum Event {
     case dismiss
     case present(viewController: UIViewController & Routing)
     case showLocations
+    case showSearch
+    case showWeatherPreview(location: Location)
 }
 
 protocol Coordinator: AnyObject {
@@ -48,6 +50,36 @@ class MainCoordinator: Coordinator {
             let locationsVC = LocationsViewController(viewModel: vm)
             locationsVC.coordinator = self
             navigationController.pushViewController(locationsVC, animated: true)
+
+        case .showSearch:
+            let searchVM = SearchViewModel(repository: repository)
+            let searchVC = SearchViewController(viewModel: searchVM)
+            searchVC.coordinator = self
+            searchVC.onLocationSelected = { [weak self] location in
+                self?.eventOccurred(with: .showWeatherPreview(location: location))
+            }
+            let nav = UINavigationController(rootViewController: searchVC)
+            nav.modalPresentationStyle = .formSheet
+            topViewController.present(nav, animated: true)
+
+        case .showWeatherPreview(let location):
+            let vm = MainWeatherViewModel(
+                repository: repository,
+                storage: storage,
+                location: location
+            )
+            let mode = MainWeatherMode.preview(location: location, storage: storage)
+            let previewVC = MainWeatherViewController(viewModel: vm, mode: mode)
+            previewVC.modalPresentationStyle = .fullScreen
+            topViewController.present(previewVC, animated: true)
         }
+    }
+
+    private var topViewController: UIViewController {
+        var top: UIViewController = navigationController
+        while let presented = top.presentedViewController {
+            top = presented
+        }
+        return top
     }
 }

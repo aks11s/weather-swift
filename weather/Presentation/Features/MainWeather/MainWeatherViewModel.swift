@@ -13,13 +13,14 @@ class MainWeatherViewModel {
 
     init(
         repository: WeatherRepositoryProtocol = WeatherRepository(),
-        storage: LocationStorageProtocol = LocationStorage()
+        storage: LocationStorageProtocol = LocationStorage(),
+        location: Location? = nil
     ) {
         self.repository = repository
         self.storage = storage
-        self.currentLocation = storage.load().first ?? Location(
-            id: 0, name: "Paris", latitude: 48.8566, longitude: 2.3522,
-            country: "France", region: "Île-de-France"
+        self.currentLocation = location ?? storage.load().first ?? Location(
+            id: 524901, name: "Moscow", latitude: 55.7558, longitude: 37.6173,
+            country: "Russia", region: "Moscow"
         )
         loadWeather()
     }
