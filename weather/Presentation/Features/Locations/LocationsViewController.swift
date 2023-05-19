@@ -8,7 +8,6 @@ class LocationsViewController: UIViewController, Routing {
 
     // MARK: - UI
 
-    // Background gradient (226deg: #391A49 → #301D5C → #262171 → #301D5C → #391A49)
     private let gradientLayer: CAGradientLayer = {
         let g = CAGradientLayer()
         g.colors = [
@@ -43,22 +42,17 @@ class LocationsViewController: UIViewController, Routing {
         return b
     }()
 
-    // Weather cards — y=142, y=319, y=496
-    private let card1 = WeatherPreviewCard()
-    private let card2 = WeatherPreviewCard()
-    private let card3 = WeatherPreviewCard()
+    // Dynamic cards container (stack of WeatherPreviewCards)
+    private var cardViews: [WeatherPreviewCard] = []
 
-    // "Add new" button — y=673, 345×59
+    // "Add new" button — 345×59
     private let addButton: UIView = {
         let v = UIView()
         v.layer.cornerRadius = 24
         v.clipsToBounds = true
         return v
     }()
-    private let addBlurView: UIVisualEffectView = {
-        let view = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
-        return view
-    }()
+    private let addBlurView = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
     private let addOverlay: UIView = {
         let v = UIView()
         v.backgroundColor = UIColor(red: 170/255, green: 165/255, blue: 165/255, alpha: 0.7)
@@ -99,6 +93,18 @@ class LocationsViewController: UIViewController, Routing {
         setupBindings()
     }
 
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        // Скрыть nav bar и отключить swipe back
+        navigationController?.setNavigationBarHidden(true, animated: false)
+        navigationController?.interactivePopGestureRecognizer?.isEnabled = false
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.setNavigationBarHidden(true, animated: false)
+    }
+
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         gradientLayer.frame = view.bounds
@@ -113,12 +119,8 @@ class LocationsViewController: UIViewController, Routing {
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
 
-        // Header
         contentView.addSubview(headingLabel)
         contentView.addSubview(searchButton)
-
-        // Cards
-        [card1, card2, card3].forEach { contentView.addSubview($0) }
 
         // Add new button
         addButton.addSubview(addBlurView)
@@ -129,76 +131,34 @@ class LocationsViewController: UIViewController, Routing {
 
         let addTap = UITapGestureRecognizer(target: self, action: #selector(addNewTapped))
         addButton.addGestureRecognizer(addTap)
-
-        // Card taps
-        [card1, card2, card3].enumerated().forEach { index, card in
-            let tap = UITapGestureRecognizer(target: self, action: #selector(cardTapped(_:)))
-            card.tag = index
-            card.addGestureRecognizer(tap)
-            card.isUserInteractionEnabled = true
-        }
     }
 
     private func setupLayout() {
-        scrollView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
+        scrollView.snp.makeConstraints { $0.edges.equalToSuperview() }
         contentView.snp.makeConstraints { make in
             make.edges.equalTo(scrollView.contentLayoutGuide)
             make.width.equalTo(scrollView.frameLayoutGuide)
         }
 
-        // Header — x=24 y=78, width=345 height=32
         headingLabel.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(86) // y=78 + 8 (text baseline offset)
+            make.top.equalToSuperview().offset(86)
             make.left.equalToSuperview().offset(24)
         }
         searchButton.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(78)
-            make.right.equalToSuperview().offset(-24) // 393-337-32=24
+            make.right.equalToSuperview().offset(-24)
             make.width.height.equalTo(32)
         }
 
-        // Cards — y=142, y=319, y=496 (each 345×153)
-        card1.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(142)
-            make.left.equalToSuperview().offset(24)
-            make.width.equalTo(345)
-            make.height.equalTo(153)
-        }
-        card2.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(319)
-            make.left.equalToSuperview().offset(24)
-            make.width.equalTo(345)
-            make.height.equalTo(153)
-        }
-        card3.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(496)
-            make.left.equalToSuperview().offset(24)
-            make.width.equalTo(345)
-            make.height.equalTo(153)
-        }
-
-        // Add new button — y=673, 345×59
-        addButton.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(673)
-            make.left.equalToSuperview().offset(24)
-            make.width.equalTo(345)
-            make.height.equalTo(59)
-            make.bottom.equalToSuperview().offset(-120)
-        }
         addBlurView.snp.makeConstraints { $0.edges.equalToSuperview() }
         addOverlay.snp.makeConstraints { $0.edges.equalToSuperview() }
-
-        // Add icon — x=108 y=12, 24×24
         addIconView.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(12)
+            make.centerY.equalToSuperview()
             make.left.equalToSuperview().offset(108)
             make.width.height.equalTo(24)
         }
-        // "Add new" text — x=140 y=12
         addLabel.snp.makeConstraints { make in
-            make.centerY.equalTo(addIconView)
+            make.centerY.equalToSuperview()
             make.left.equalTo(addIconView.snp.right).offset(8)
         }
     }
@@ -206,17 +166,61 @@ class LocationsViewController: UIViewController, Routing {
     private func setupBindings() {
         viewModel.stateDidChange = { [weak self] state in
             if case .loaded(let locations) = state {
-                self?.updateCards(with: locations)
+                self?.renderCards(with: locations)
             }
         }
     }
 
-    private func updateCards(with locations: [Weather]) {
-        let cards = [card1, card2, card3]
-        zip(cards, locations).forEach { card, weather in
+    // MARK: - Dynamic cards
+
+    private func renderCards(with weathers: [Weather]) {
+        // Удаляем старые карточки
+        cardViews.forEach { $0.removeFromSuperview() }
+        cardViews = []
+
+        var previousAnchor: ConstraintItem = headingLabel.snp.bottom
+
+        for (index, weather) in weathers.enumerated() {
+            let card = WeatherPreviewCard()
             card.configure(with: weather)
+            card.tag = index
+            card.isUserInteractionEnabled = true
+
+            let tap = UITapGestureRecognizer(target: self, action: #selector(cardTapped(_:)))
+            card.addGestureRecognizer(tap)
+
+            contentView.addSubview(card)
+            card.snp.makeConstraints { make in
+                // Первая карточка: y=142 от contentView, остальные: +24 от предыдущей
+                if index == 0 {
+                    make.top.equalToSuperview().offset(142)
+                } else {
+                    make.top.equalTo(previousAnchor).offset(24)
+                }
+                make.left.equalToSuperview().offset(24)
+                make.width.equalTo(345)
+                make.height.equalTo(153)
+            }
+
+            previousAnchor = card.snp.bottom
+            cardViews.append(card)
+        }
+
+        // "Add new" — всегда ниже последней карточки
+        addButton.snp.remakeConstraints { make in
+            if cardViews.isEmpty {
+                make.top.equalToSuperview().offset(142)
+            } else {
+                make.top.equalTo(previousAnchor).offset(24)
+            }
+            make.left.equalToSuperview().offset(24)
+            make.width.equalTo(345)
+            make.height.equalTo(59)
+            make.bottom.equalToSuperview().offset(-40)
         }
     }
+
+    // MARK: - Actions
 
     @objc private func addNewTapped() {
         coordinator?.eventOccurred(with: .showSearch)
@@ -227,7 +231,6 @@ class LocationsViewController: UIViewController, Routing {
               case .loaded(let weathers) = viewModel.state,
               index < weathers.count
         else { return }
-        let location = weathers[index].city
-        coordinator?.eventOccurred(with: .showWeatherPreview(location: location))
+        coordinator?.eventOccurred(with: .showWeather(location: weathers[index].city))
     }
 }

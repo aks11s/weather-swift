@@ -78,6 +78,12 @@ class MainWeatherViewController: UIViewController, Routing {
         setupBindings()
     }
 
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(true, animated: false)
+        navigationController?.interactivePopGestureRecognizer?.isEnabled = false
+    }
+
     // MARK: - Setup
 
     private func setupViews() {

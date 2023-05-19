@@ -9,7 +9,8 @@ enum Event {
     case present(viewController: UIViewController & Routing)
     case showLocations
     case showSearch
-    case showWeatherPreview(location: Location)
+    case showWeatherPreview(location: Location)  // modal — при добавлении
+    case showWeather(location: Location)          // push — при тапе на ячейку
 }
 
 protocol Coordinator: AnyObject {
@@ -63,15 +64,19 @@ class MainCoordinator: Coordinator {
             topViewController.present(nav, animated: true)
 
         case .showWeatherPreview(let location):
-            let vm = MainWeatherViewModel(
-                repository: repository,
-                storage: storage,
-                location: location
+            let vm = MainWeatherViewModel(repository: repository, storage: storage, location: location)
+            let previewVC = MainWeatherViewController(
+                viewModel: vm,
+                mode: .preview(location: location, storage: storage)
             )
-            let mode = MainWeatherMode.preview(location: location, storage: storage)
-            let previewVC = MainWeatherViewController(viewModel: vm, mode: mode)
             previewVC.modalPresentationStyle = .fullScreen
             topViewController.present(previewVC, animated: true)
+
+        case .showWeather(let location):
+            let vm = MainWeatherViewModel(repository: repository, storage: storage, location: location)
+            let weatherVC = MainWeatherViewController(viewModel: vm, mode: .normal)
+            weatherVC.coordinator = self
+            navigationController.pushViewController(weatherVC, animated: true)
         }
     }
 
