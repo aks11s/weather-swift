@@ -95,9 +95,9 @@ class LocationsViewController: UIViewController, Routing {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        // Скрыть nav bar и отключить swipe back
         navigationController?.setNavigationBarHidden(true, animated: false)
         navigationController?.interactivePopGestureRecognizer?.isEnabled = false
+        viewModel.load() // перезагрузить после добавления нового города
     }
 
     override func viewWillDisappear(_ animated: Bool) {

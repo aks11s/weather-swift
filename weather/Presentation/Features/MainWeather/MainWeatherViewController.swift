@@ -367,7 +367,8 @@ class MainWeatherViewController: UIViewController, Routing {
                 dismiss(animated: true)
             } else {
                 storage.add(location)
-                configureMenuButton()
+                // Закрыть и превью, и SearchVC одновременно
+                presentingViewController?.presentingViewController?.dismiss(animated: true)
             }
         }
     }
