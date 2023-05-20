@@ -9,6 +9,7 @@ class LocationsViewModel {
 
     private let repository: WeatherRepositoryProtocol
     private let storage: LocationStorageProtocol
+    private var allWeathers: [Weather] = []
 
     init(
         repository: WeatherRepositoryProtocol = WeatherRepository(),
@@ -36,6 +37,7 @@ class LocationsViewModel {
                     }
                     return results
                 }
+                self.allWeathers = weathers
                 state = .loaded(weathers)
             } catch {
                 state = .error(error)
@@ -51,5 +53,16 @@ class LocationsViewModel {
     func removeLocation(id: Int) {
         storage.remove(id: id)
         load()
+    }
+
+    func filter(by query: String) {
+        guard !query.isEmpty else {
+            state = .loaded(allWeathers)
+            return
+        }
+        let filtered = allWeathers.filter {
+            $0.city.name.lowercased().contains(query.lowercased())
+        }
+        state = .loaded(filtered)
     }
 }
