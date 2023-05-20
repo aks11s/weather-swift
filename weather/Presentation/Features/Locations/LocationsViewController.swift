@@ -42,6 +42,26 @@ class LocationsViewController: UIViewController, Routing {
         return b
     }()
 
+    private let searchBar: UISearchBar = {
+        let s = UISearchBar()
+        s.placeholder = "Search cities..."
+        s.searchBarStyle = .minimal
+        s.barTintColor = .clear
+        s.backgroundColor = .clear
+        s.tintColor = .white
+        s.clipsToBounds = true
+        if let tf = s.value(forKey: "searchField") as? UITextField {
+            tf.textColor = .white
+            tf.attributedPlaceholder = NSAttributedString(
+                string: "Search cities...",
+                attributes: [.foregroundColor: UIColor.white.withAlphaComponent(0.5)]
+            )
+        }
+        return s
+    }()
+
+    private var searchBarHeightConstraint: Constraint?
+
     // Dynamic cards container (stack of WeatherPreviewCards)
     private var cardViews: [WeatherPreviewCard] = []
 
@@ -121,6 +141,10 @@ class LocationsViewController: UIViewController, Routing {
 
         contentView.addSubview(headingLabel)
         contentView.addSubview(searchButton)
+        contentView.addSubview(searchBar)
+        searchBar.delegate = self
+
+        searchButton.addTarget(self, action: #selector(searchTapped), for: .touchUpInside)
 
         // Add new button
         addButton.addSubview(addBlurView)
@@ -148,6 +172,13 @@ class LocationsViewController: UIViewController, Routing {
             make.top.equalToSuperview().offset(78)
             make.right.equalToSuperview().offset(-24)
             make.width.height.equalTo(32)
+        }
+
+        searchBar.snp.makeConstraints { make in
+            make.top.equalTo(headingLabel.snp.bottom).offset(8)
+            make.left.equalToSuperview().offset(24)
+            make.width.equalTo(345)
+            searchBarHeightConstraint = make.height.equalTo(0).constraint
         }
 
         addBlurView.snp.makeConstraints { $0.edges.equalToSuperview() }
@@ -178,7 +209,7 @@ class LocationsViewController: UIViewController, Routing {
         cardViews.forEach { $0.removeFromSuperview() }
         cardViews = []
 
-        var previousAnchor: ConstraintItem = headingLabel.snp.bottom
+        var previousAnchor: ConstraintItem = searchBar.snp.bottom
 
         for (index, weather) in weathers.enumerated() {
             let card = WeatherPreviewCard()
@@ -191,12 +222,7 @@ class LocationsViewController: UIViewController, Routing {
 
             contentView.addSubview(card)
             card.snp.makeConstraints { make in
-                // Первая карточка: y=142 от contentView, остальные: +24 от предыдущей
-                if index == 0 {
-                    make.top.equalToSuperview().offset(142)
-                } else {
-                    make.top.equalTo(previousAnchor).offset(24)
-                }
+                make.top.equalTo(previousAnchor).offset(index == 0 ? 24 : 24)
                 make.left.equalToSuperview().offset(24)
                 make.width.equalTo(345)
                 make.height.equalTo(153)
@@ -207,12 +233,9 @@ class LocationsViewController: UIViewController, Routing {
         }
 
         // "Add new" — всегда ниже последней карточки
+        let addButtonTopAnchor: ConstraintItem = cardViews.isEmpty ? searchBar.snp.bottom : previousAnchor
         addButton.snp.remakeConstraints { make in
-            if cardViews.isEmpty {
-                make.top.equalToSuperview().offset(142)
-            } else {
-                make.top.equalTo(previousAnchor).offset(24)
-            }
+            make.top.equalTo(addButtonTopAnchor).offset(24)
             make.left.equalToSuperview().offset(24)
             make.width.equalTo(345)
             make.height.equalTo(59)
@@ -221,6 +244,25 @@ class LocationsViewController: UIViewController, Routing {
     }
 
     // MARK: - Actions
+
+    private var isSearchActive = false
+
+    @objc private func searchTapped() {
+        isSearchActive = !isSearchActive
+        searchBarHeightConstraint?.update(offset: isSearchActive ? 44 : 0)
+
+        UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
+            self.contentView.layoutIfNeeded()
+        }
+
+        if isSearchActive {
+            searchBar.becomeFirstResponder()
+        } else {
+            searchBar.text = nil
+            searchBar.resignFirstResponder()
+            viewModel.filter(by: "")
+        }
+    }
 
     @objc private func addNewTapped() {
         coordinator?.eventOccurred(with: .showSearch)
@@ -232,5 +274,17 @@ class LocationsViewController: UIViewController, Routing {
               index < weathers.count
         else { return }
         coordinator?.eventOccurred(with: .showWeather(location: weathers[index].city))
+    }
+}
+
+// MARK: - UISearchBarDelegate
+
+extension LocationsViewController: UISearchBarDelegate {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        viewModel.filter(by: searchText)
+    }
+
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
     }
 }
