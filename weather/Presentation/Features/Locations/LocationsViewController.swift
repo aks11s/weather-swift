@@ -1,7 +1,7 @@
 import UIKit
 import SnapKit
 
-class LocationsViewController: UIViewController, Routing {
+class LocationsViewController: UIViewController, Routing, UIGestureRecognizerDelegate {
     weak var coordinator: Coordinator?
 
     private let viewModel: LocationsViewModel
@@ -64,6 +64,8 @@ class LocationsViewController: UIViewController, Routing {
 
     // Dynamic cards container (stack of WeatherPreviewCards)
     private var cardViews: [WeatherPreviewCard] = []
+    private var containerViews: [UIView] = []
+    private var currentlySwipedIndex: Int?
 
     // "Add new" button — 345×59
     private let addButton: UIView = {
@@ -75,7 +77,7 @@ class LocationsViewController: UIViewController, Routing {
     private let addBlurView = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
     private let addOverlay: UIView = {
         let v = UIView()
-        v.backgroundColor = UIColor(red: 170/255, green: 165/255, blue: 165/255, alpha: 0.7)
+        v.backgroundColor = UIColor(red: 170/255, green: 165/255, blue: 165/255, alpha: 1)
         return v
     }()
     private let addIconView: UIImageView = {
@@ -205,35 +207,69 @@ class LocationsViewController: UIViewController, Routing {
     // MARK: - Dynamic cards
 
     private func renderCards(with weathers: [Weather]) {
-        // Удаляем старые карточки
-        cardViews.forEach { $0.removeFromSuperview() }
+        containerViews.forEach { $0.removeFromSuperview() }
         cardViews = []
+        containerViews = []
+        currentlySwipedIndex = nil
 
         var previousAnchor: ConstraintItem = searchBar.snp.bottom
 
         for (index, weather) in weathers.enumerated() {
-            let card = WeatherPreviewCard()
-            card.configure(with: weather)
-            card.tag = index
-            card.isUserInteractionEnabled = true
-
-            let tap = UITapGestureRecognizer(target: self, action: #selector(cardTapped(_:)))
-            card.addGestureRecognizer(tap)
-
-            contentView.addSubview(card)
-            card.snp.makeConstraints { make in
-                make.top.equalTo(previousAnchor).offset(index == 0 ? 24 : 24)
+            // Container — красный фон при свайпе (удаление)
+            let container = UIView()
+            container.backgroundColor = UIColor(red: 1, green: 0.27, blue: 0.23, alpha: 1)
+            container.layer.cornerRadius = 24
+            container.clipsToBounds = true
+            contentView.addSubview(container)
+            container.snp.makeConstraints { make in
+                make.top.equalTo(previousAnchor).offset(24)
                 make.left.equalToSuperview().offset(24)
                 make.width.equalTo(345)
                 make.height.equalTo(153)
             }
 
-            previousAnchor = card.snp.bottom
+            // Иконка корзины (справа в контейнере)
+            let trashIcon = UIImageView(image: UIImage(systemName: "trash"))
+            trashIcon.tintColor = .white
+            trashIcon.contentMode = .scaleAspectFit
+            container.addSubview(trashIcon)
+            trashIcon.snp.makeConstraints { make in
+                make.centerY.equalToSuperview()
+                make.right.equalToSuperview().offset(-24)
+                make.width.height.equalTo(24)
+            }
+
+            // Прозрачная кнопка удаления (правые 80pt контейнера)
+            let deleteButton = UIButton()
+            deleteButton.tag = index
+            deleteButton.addTarget(self, action: #selector(deleteTapped(_:)), for: .touchUpInside)
+            container.addSubview(deleteButton)
+            deleteButton.snp.makeConstraints { make in
+                make.right.top.bottom.equalToSuperview()
+                make.width.equalTo(80)
+            }
+
+            // Карточка поверх (скользит влево, открывая красный фон)
+            let card = WeatherPreviewCard()
+            card.configure(with: weather)
+            card.tag = index
+            card.isUserInteractionEnabled = true
+            container.addSubview(card)
+            card.snp.makeConstraints { $0.edges.equalToSuperview() }
+
+            let pan = UIPanGestureRecognizer(target: self, action: #selector(handleCardPan(_:)))
+            pan.delegate = self
+            card.addGestureRecognizer(pan)
+
+            let tap = UITapGestureRecognizer(target: self, action: #selector(cardTapped(_:)))
+            card.addGestureRecognizer(tap)
+
+            containerViews.append(container)
             cardViews.append(card)
+            previousAnchor = container.snp.bottom
         }
 
-        // "Add new" — всегда ниже последней карточки
-        let addButtonTopAnchor: ConstraintItem = cardViews.isEmpty ? searchBar.snp.bottom : previousAnchor
+        let addButtonTopAnchor: ConstraintItem = containerViews.isEmpty ? searchBar.snp.bottom : previousAnchor
         addButton.snp.remakeConstraints { make in
             make.top.equalTo(addButtonTopAnchor).offset(24)
             make.left.equalToSuperview().offset(24)
@@ -241,6 +277,24 @@ class LocationsViewController: UIViewController, Routing {
             make.height.equalTo(59)
             make.bottom.equalToSuperview().offset(-40)
         }
+    }
+
+    // MARK: - Swipe helpers
+
+    private func openCard(at index: Int) {
+        guard index < cardViews.count else { return }
+        UIView.animate(withDuration: 0.45, delay: 0, usingSpringWithDamping: 0.9, initialSpringVelocity: 0.3) {
+            self.cardViews[index].transform = CGAffineTransform(translationX: -80, y: 0)
+        }
+        currentlySwipedIndex = index
+    }
+
+    private func closeCard(at index: Int) {
+        guard index < cardViews.count else { return }
+        UIView.animate(withDuration: 0.45, delay: 0, usingSpringWithDamping: 0.9, initialSpringVelocity: 0.3) {
+            self.cardViews[index].transform = .identity
+        }
+        if currentlySwipedIndex == index { currentlySwipedIndex = nil }
     }
 
     // MARK: - Actions
@@ -268,12 +322,65 @@ class LocationsViewController: UIViewController, Routing {
         coordinator?.eventOccurred(with: .showSearch)
     }
 
+    @objc private func handleCardPan(_ gesture: UIPanGestureRecognizer) {
+        guard let card = gesture.view else { return }
+        let index = card.tag
+        let translation = gesture.translation(in: card.superview)
+
+        switch gesture.state {
+        case .began:
+            if let prev = currentlySwipedIndex, prev != index { closeCard(at: prev) }
+
+        case .changed:
+            card.transform = CGAffineTransform(translationX: min(0, translation.x), y: 0)
+
+        case .ended, .cancelled:
+            let velocity = gesture.velocity(in: card.superview)
+            if translation.x < -60 || velocity.x < -500 {
+                openCard(at: index)
+            } else {
+                closeCard(at: index)
+            }
+
+        default:
+            break
+        }
+    }
+
+    @objc private func deleteTapped(_ sender: UIButton) {
+        let index = sender.tag
+        guard case .loaded(let weathers) = viewModel.state, index < weathers.count else { return }
+        let locationId = weathers[index].city.id
+        let container = containerViews[index]
+
+        UIView.animate(withDuration: 0.4, delay: 0, options: .curveEaseInOut, animations: {
+            container.alpha = 0
+            container.transform = CGAffineTransform(translationX: -345, y: 0)
+        }) { _ in
+            self.viewModel.removeLocation(id: locationId)
+        }
+    }
+
     @objc private func cardTapped(_ gesture: UITapGestureRecognizer) {
-        guard let index = gesture.view?.tag,
-              case .loaded(let weathers) = viewModel.state,
-              index < weathers.count
-        else { return }
+        guard let index = gesture.view?.tag else { return }
+
+        if currentlySwipedIndex == index {
+            closeCard(at: index)
+            return
+        }
+
+        guard case .loaded(let weathers) = viewModel.state, index < weathers.count else { return }
         coordinator?.eventOccurred(with: .showWeather(location: weathers[index].city))
+    }
+}
+
+// MARK: - UIGestureRecognizerDelegate
+
+extension LocationsViewController {
+    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        guard let pan = gestureRecognizer as? UIPanGestureRecognizer else { return true }
+        let velocity = pan.velocity(in: pan.view)
+        return abs(velocity.x) > abs(velocity.y)
     }
 }
 

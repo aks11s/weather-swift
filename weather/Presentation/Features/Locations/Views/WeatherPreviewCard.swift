@@ -6,9 +6,10 @@ class WeatherPreviewCard: UIView {
 
     // MARK: - UI
 
-    // Blur background (backdropFilter: blur(4px), borderRadius: 24)
-    private let blurView: UIVisualEffectView = {
-        let view = UIVisualEffectView(effect: UIBlurEffect(style: .systemUltraThinMaterialDark))
+    // Background (borderRadius: 24)
+    private let blurView: UIView = {
+        let view = UIView()
+        view.backgroundColor = UIColor(red: 170/255, green: 165/255, blue: 165/255, alpha: 1)
         view.layer.cornerRadius = 24
         view.clipsToBounds = true
         return view
