@@ -22,7 +22,7 @@ class MainWeatherViewController: UIViewController, Routing {
     // Header (y=78)
     private let pinIconView = UIImageView()
     private let cityLabel = UILabel()
-    private let menuButton = UIButton()
+    private let menuButton = UIButton(type: .custom)
 
     // Date/Updated (y=171, y=227)
     private let dateLabel = UILabel()
@@ -208,8 +208,9 @@ class MainWeatherViewController: UIViewController, Routing {
 
         menuButton.snp.makeConstraints { make in
             make.centerY.equalTo(pinIconView)
-            make.right.equalToSuperview().offset(-24) // 393-337-32=24 per Figma
-            make.width.height.equalTo(32)
+            make.right.equalToSuperview().offset(-24)
+            make.height.equalTo(32)
+            make.width.greaterThanOrEqualTo(32)
         }
 
         // MARK: Date — y=171, Updated — y=227
@@ -353,6 +354,7 @@ class MainWeatherViewController: UIViewController, Routing {
             let title = isSaved ? "Cancel" : "Add"
             menuButton.setImage(nil, for: .normal)
             menuButton.setTitle(title, for: .normal)
+            menuButton.setTitleColor(.white, for: .normal)
             menuButton.titleLabel?.font = UIFont.systemFont(ofSize: 17, weight: .medium)
         }
     }
