@@ -69,7 +69,7 @@ class MainCoordinator: Coordinator {
                 viewModel: vm,
                 mode: .preview(location: location, storage: storage)
             )
-            previewVC.modalPresentationStyle = .fullScreen
+            previewVC.modalPresentationStyle = .pageSheet
             topViewController.present(previewVC, animated: true)
 
         case .showWeather(let location):
