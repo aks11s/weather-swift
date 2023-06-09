@@ -36,12 +36,12 @@ class ForecastCell: UICollectionViewCell {
 
         // "Wed 16" — Roboto Regular 14pt, #ECECEC
         dayDateLabel.font = UIFont.systemFont(ofSize: 14, weight: .regular)
-        dayDateLabel.textColor = UIColor(red: 236/255, green: 236/255, blue: 236/255, alpha: 1)
+        dayDateLabel.textColor = AppColor.forecastText
         dayDateLabel.textAlignment = .center
         stackView.addArrangedSubview(dayDateLabel)
 
         // Weather icon — 40×40
-        weatherIconView.tintColor = UIColor(red: 236/255, green: 236/255, blue: 236/255, alpha: 1)
+        weatherIconView.tintColor = AppColor.forecastText
         weatherIconView.contentMode = .scaleAspectFit
         stackView.addArrangedSubview(weatherIconView)
         weatherIconView.snp.makeConstraints { make in
@@ -50,12 +50,12 @@ class ForecastCell: UICollectionViewCell {
 
         // Temperature — Roboto Regular 16pt, #ECECEC
         tempLabel.font = UIFont.systemFont(ofSize: 16, weight: .regular)
-        tempLabel.textColor = UIColor(red: 236/255, green: 236/255, blue: 236/255, alpha: 1)
+        tempLabel.textColor = AppColor.forecastText
         stackView.addArrangedSubview(tempLabel)
 
         // Wind — Roboto Regular 10pt, 2 lines, #ECECEC
         windLabel.font = UIFont.systemFont(ofSize: 10, weight: .regular)
-        windLabel.textColor = UIColor(red: 236/255, green: 236/255, blue: 236/255, alpha: 1)
+        windLabel.textColor = AppColor.forecastText
         windLabel.textAlignment = .center
         windLabel.numberOfLines = 2
         stackView.addArrangedSubview(windLabel)

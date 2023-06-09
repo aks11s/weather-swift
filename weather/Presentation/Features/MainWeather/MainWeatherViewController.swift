@@ -48,7 +48,7 @@ class MainWeatherViewController: UIViewController, Routing {
     }()
     private let forecastOverlay: UIView = {
         let v = UIView()
-        v.backgroundColor = UIColor(red: 83/255, green: 83/255, blue: 83/255, alpha: 0.3)
+        v.backgroundColor = AppColor.forecastOverlay
         return v
     }()
     private let forecastCollectionView: UICollectionView
@@ -87,7 +87,7 @@ class MainWeatherViewController: UIViewController, Routing {
     // MARK: - Setup
 
     private func setupViews() {
-        view.backgroundColor = .black
+        view.backgroundColor = AppColor.black
 
         // Background photo
         backgroundImageView.contentMode = .scaleAspectFill
@@ -95,7 +95,7 @@ class MainWeatherViewController: UIViewController, Routing {
         view.addSubview(backgroundImageView)
 
         // Darkening overlay — rgba(0,0,0,0.33) per Figma
-        darkeningView.backgroundColor = UIColor.black.withAlphaComponent(0.33)
+        darkeningView.backgroundColor = AppColor.blackOverlay
         view.addSubview(darkeningView)
 
         // Scroll view
@@ -105,54 +105,54 @@ class MainWeatherViewController: UIViewController, Routing {
 
         // Pin icon (location.fill or asset)
         pinIconView.image = UIImage(named: "icon_location") ?? UIImage(systemName: "location.fill")
-        pinIconView.tintColor = .white
+        pinIconView.tintColor = AppColor.white
         pinIconView.contentMode = .scaleAspectFit
         contentView.addSubview(pinIconView)
 
         // City label — Roboto Regular 18pt
         cityLabel.font = UIFont.systemFont(ofSize: 18, weight: .regular)
-        cityLabel.textColor = .white
+        cityLabel.textColor = AppColor.white
         contentView.addSubview(cityLabel)
 
         // Menu / Add / Cancel button
-        menuButton.tintColor = .white
+        menuButton.tintColor = AppColor.white
         menuButton.addTarget(self, action: #selector(menuTapped), for: .touchUpInside)
         contentView.addSubview(menuButton)
         configureMenuButton()
 
         // Date — Roboto Medium 40pt
         dateLabel.font = UIFont.systemFont(ofSize: 40, weight: .medium)
-        dateLabel.textColor = .white
+        dateLabel.textColor = AppColor.white
         dateLabel.textAlignment = .center
         contentView.addSubview(dateLabel)
 
         // Updated — Roboto Light 16pt
         updatedLabel.font = UIFont.systemFont(ofSize: 16, weight: .light)
-        updatedLabel.textColor = .white
+        updatedLabel.textColor = AppColor.white
         updatedLabel.textAlignment = .center
         contentView.addSubview(updatedLabel)
 
         // Weather icon — 95×95
         weatherIconView.contentMode = .scaleAspectFit
-        weatherIconView.tintColor = .white
+        weatherIconView.tintColor = AppColor.white
         contentView.addSubview(weatherIconView)
 
         // Condition — Roboto Bold 40pt
         conditionLabel.font = UIFont.systemFont(ofSize: 40, weight: .bold)
-        conditionLabel.textColor = .white
+        conditionLabel.textColor = AppColor.white
         conditionLabel.textAlignment = .center
         contentView.addSubview(conditionLabel)
 
         // Temperature — Roboto Medium 86pt
         temperatureLabel.font = UIFont.systemFont(ofSize: 86, weight: .medium)
-        temperatureLabel.textColor = .white
+        temperatureLabel.textColor = AppColor.white
         temperatureLabel.textAlignment = .center
         contentView.addSubview(temperatureLabel)
 
         // ºC — Sen Bold 24pt (mapped to system bold)
         celsiusLabel.text = "ºC"
         celsiusLabel.font = UIFont.systemFont(ofSize: 24, weight: .bold)
-        celsiusLabel.textColor = .white
+        celsiusLabel.textColor = AppColor.white
         contentView.addSubview(celsiusLabel)
 
         // Details
@@ -168,7 +168,7 @@ class MainWeatherViewController: UIViewController, Routing {
         forecastBlurView.contentView.addSubview(forecastOverlay)
 
         // Forecast collection view
-        forecastCollectionView.backgroundColor = .clear
+        forecastCollectionView.backgroundColor = AppColor.clear
         forecastCollectionView.delegate = self
         forecastCollectionView.dataSource = self
         forecastCollectionView.register(ForecastCell.self, forCellWithReuseIdentifier: "ForecastCell")
@@ -354,7 +354,7 @@ class MainWeatherViewController: UIViewController, Routing {
             let title = isSaved ? "Cancel" : "Add"
             menuButton.setImage(nil, for: .normal)
             menuButton.setTitle(title, for: .normal)
-            menuButton.setTitleColor(.white, for: .normal)
+            menuButton.setTitleColor(AppColor.white, for: .normal)
             menuButton.titleLabel?.font = UIFont.systemFont(ofSize: 17, weight: .medium)
         }
     }

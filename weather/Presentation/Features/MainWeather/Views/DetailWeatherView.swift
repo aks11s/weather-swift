@@ -31,7 +31,7 @@ class DetailWeatherView: UIView {
         }
 
         // Icon — 30×30 per Figma layout_6O7BG2
-        iconView.tintColor = .white
+        iconView.tintColor = AppColor.white
         iconView.contentMode = .scaleAspectFit
         stackView.addArrangedSubview(iconView)
         iconView.snp.makeConstraints { make in
@@ -40,7 +40,7 @@ class DetailWeatherView: UIView {
 
         // Section label — Roboto Medium 14pt, style_E1X9LU
         labelView.font = UIFont.systemFont(ofSize: 14, weight: .medium)
-        labelView.textColor = .white
+        labelView.textColor = AppColor.white
         labelView.textAlignment = .center
         stackView.addArrangedSubview(labelView)
 
@@ -50,11 +50,11 @@ class DetailWeatherView: UIView {
         stackView.addArrangedSubview(valueStack)
 
         valueLabel.font = UIFont.systemFont(ofSize: 14, weight: .medium)
-        valueLabel.textColor = .white
+        valueLabel.textColor = AppColor.white
         valueStack.addArrangedSubview(valueLabel)
 
         unitLabel.font = UIFont.systemFont(ofSize: 14, weight: .medium)
-        unitLabel.textColor = .white
+        unitLabel.textColor = AppColor.white
         valueStack.addArrangedSubview(unitLabel)
     }
 
