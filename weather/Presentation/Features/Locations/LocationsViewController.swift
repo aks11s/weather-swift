@@ -11,11 +11,11 @@ class LocationsViewController: UIViewController, Routing, UIGestureRecognizerDel
     private let gradientLayer: CAGradientLayer = {
         let g = CAGradientLayer()
         g.colors = [
-            UIColor(red: 57/255, green: 26/255, blue: 73/255, alpha: 1).cgColor,
-            UIColor(red: 48/255, green: 29/255, blue: 92/255, alpha: 1).cgColor,
-            UIColor(red: 38/255, green: 33/255, blue: 113/255, alpha: 1).cgColor,
-            UIColor(red: 48/255, green: 29/255, blue: 92/255, alpha: 1).cgColor,
-            UIColor(red: 57/255, green: 26/255, blue: 73/255, alpha: 1).cgColor
+            AppColor.gradientTop.cgColor,
+            AppColor.gradientMid.cgColor,
+            AppColor.gradientBottom.cgColor,
+            AppColor.gradientMid.cgColor,
+            AppColor.gradientTop.cgColor
         ]
         g.locations = [0.11, 0.33, 0.57, 0.71, 0.91]
         g.startPoint = CGPoint(x: 1, y: 1)
@@ -31,14 +31,14 @@ class LocationsViewController: UIViewController, Routing, UIGestureRecognizerDel
         let l = UILabel()
         l.text = "Saved Locations"
         l.font = UIFont.systemFont(ofSize: 18, weight: .regular)
-        l.textColor = .white
+        l.textColor = AppColor.white
         return l
     }()
 
     private let searchButton: UIButton = {
         let b = UIButton()
         b.setImage(UIImage(named: "icon_search") ?? UIImage(systemName: "magnifyingglass"), for: .normal)
-        b.tintColor = .white
+        b.tintColor = AppColor.white
         return b
     }()
 
@@ -46,15 +46,15 @@ class LocationsViewController: UIViewController, Routing, UIGestureRecognizerDel
         let s = UISearchBar()
         s.placeholder = "Search cities..."
         s.searchBarStyle = .minimal
-        s.barTintColor = .clear
-        s.backgroundColor = .clear
-        s.tintColor = .white
+        s.barTintColor = AppColor.clear
+        s.backgroundColor = AppColor.clear
+        s.tintColor = AppColor.white
         s.clipsToBounds = true
         if let tf = s.value(forKey: "searchField") as? UITextField {
-            tf.textColor = .white
+            tf.textColor = AppColor.white
             tf.attributedPlaceholder = NSAttributedString(
                 string: "Search cities...",
-                attributes: [.foregroundColor: UIColor.white.withAlphaComponent(0.5)]
+                attributes: [.foregroundColor: AppColor.whiteFaint]
             )
         }
         return s
@@ -77,13 +77,13 @@ class LocationsViewController: UIViewController, Routing, UIGestureRecognizerDel
     private let addBlurView = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
     private let addOverlay: UIView = {
         let v = UIView()
-        v.backgroundColor = UIColor(red: 170/255, green: 165/255, blue: 165/255, alpha: 1)
+        v.backgroundColor = AppColor.cardBackground
         return v
     }()
     private let addIconView: UIImageView = {
         let iv = UIImageView()
         iv.image = UIImage(named: "icon_add") ?? UIImage(systemName: "plus")
-        iv.tintColor = UIColor.white.withAlphaComponent(0.8)
+        iv.tintColor = AppColor.whiteMuted
         iv.contentMode = .scaleAspectFit
         return iv
     }()
@@ -91,7 +91,7 @@ class LocationsViewController: UIViewController, Routing, UIGestureRecognizerDel
         let l = UILabel()
         l.text = "Add new"
         l.font = UIFont.systemFont(ofSize: 24, weight: .medium)
-        l.textColor = UIColor.white.withAlphaComponent(0.8)
+        l.textColor = AppColor.whiteMuted
         return l
     }()
 
@@ -217,7 +217,7 @@ class LocationsViewController: UIViewController, Routing, UIGestureRecognizerDel
         for (index, weather) in weathers.enumerated() {
             // Container — красный фон при свайпе (удаление)
             let container = UIView()
-            container.backgroundColor = UIColor(red: 1, green: 0.27, blue: 0.23, alpha: 1)
+            container.backgroundColor = AppColor.deleteRed
             container.layer.cornerRadius = 24
             container.clipsToBounds = true
             contentView.addSubview(container)
@@ -230,7 +230,7 @@ class LocationsViewController: UIViewController, Routing, UIGestureRecognizerDel
 
             // Иконка корзины (справа в контейнере)
             let trashIcon = UIImageView(image: UIImage(systemName: "trash"))
-            trashIcon.tintColor = .white
+            trashIcon.tintColor = AppColor.white
             trashIcon.contentMode = .scaleAspectFit
             container.addSubview(trashIcon)
             trashIcon.snp.makeConstraints { make in

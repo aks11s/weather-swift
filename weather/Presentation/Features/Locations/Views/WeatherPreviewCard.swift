@@ -9,7 +9,7 @@ class WeatherPreviewCard: UIView {
     // Background (borderRadius: 24)
     private let blurView: UIView = {
         let view = UIView()
-        view.backgroundColor = UIColor(red: 170/255, green: 165/255, blue: 165/255, alpha: 1)
+        view.backgroundColor = AppColor.cardBackground
         view.layer.cornerRadius = 24
         view.clipsToBounds = true
         return view
@@ -19,7 +19,7 @@ class WeatherPreviewCard: UIView {
     private let cityLabel: UILabel = {
         let l = UILabel()
         l.font = UIFont.systemFont(ofSize: 24, weight: .bold)
-        l.textColor = .white
+        l.textColor = AppColor.white
         return l
     }()
 
@@ -27,7 +27,7 @@ class WeatherPreviewCard: UIView {
     private let conditionLabel: UILabel = {
         let l = UILabel()
         l.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        l.textColor = UIColor.white.withAlphaComponent(0.8)
+        l.textColor = AppColor.whiteMuted
         return l
     }()
 
@@ -37,13 +37,13 @@ class WeatherPreviewCard: UIView {
         let l = UILabel()
         l.text = "Humidity"
         l.font = UIFont.systemFont(ofSize: 16, weight: .light)
-        l.textColor = UIColor.white.withAlphaComponent(0.8)
+        l.textColor = AppColor.whiteMuted
         return l
     }()
     private let humidityValueLabel: UILabel = {
         let l = UILabel()
         l.font = UIFont.systemFont(ofSize: 16, weight: .regular)
-        l.textColor = .white
+        l.textColor = AppColor.white
         return l
     }()
 
@@ -53,13 +53,13 @@ class WeatherPreviewCard: UIView {
         let l = UILabel()
         l.text = "Wind"
         l.font = UIFont.systemFont(ofSize: 16, weight: .light)
-        l.textColor = UIColor.white.withAlphaComponent(0.8)
+        l.textColor = AppColor.whiteMuted
         return l
     }()
     private let windValueLabel: UILabel = {
         let l = UILabel()
         l.font = UIFont.systemFont(ofSize: 16, weight: .regular)
-        l.textColor = .white
+        l.textColor = AppColor.white
         return l
     }()
 
@@ -68,7 +68,7 @@ class WeatherPreviewCard: UIView {
     private let temperatureLabel: UILabel = {
         let l = UILabel()
         l.font = UIFont.systemFont(ofSize: 48, weight: .medium)
-        l.textColor = .white
+        l.textColor = AppColor.white
         l.textAlignment = .center
         return l
     }()
@@ -77,7 +77,7 @@ class WeatherPreviewCard: UIView {
         let l = UILabel()
         l.text = "ºC"
         l.font = UIFont.systemFont(ofSize: 24, weight: .bold)
-        l.textColor = .white
+        l.textColor = AppColor.white
         return l
     }()
 
@@ -85,7 +85,7 @@ class WeatherPreviewCard: UIView {
     private let weatherIconView: UIImageView = {
         let iv = UIImageView()
         iv.contentMode = .scaleAspectFit
-        iv.tintColor = .white
+        iv.tintColor = AppColor.white
         return iv
     }()
 

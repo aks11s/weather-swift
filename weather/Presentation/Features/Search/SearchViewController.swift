@@ -14,25 +14,25 @@ class SearchViewController: UIViewController, Routing {
         let sb = UISearchBar()
         sb.placeholder = "Search city..."
         sb.searchBarStyle = .minimal
-        sb.tintColor = .white
-        sb.barTintColor = .clear
-        sb.searchTextField.textColor = .white
-        sb.searchTextField.backgroundColor = UIColor.white.withAlphaComponent(0.15)
-        sb.searchTextField.leftView?.tintColor = UIColor.white.withAlphaComponent(0.6)
+        sb.tintColor = AppColor.white
+        sb.barTintColor = AppColor.clear
+        sb.searchTextField.textColor = AppColor.white
+        sb.searchTextField.backgroundColor = AppColor.whiteOverlay
+        sb.searchTextField.leftView?.tintColor = AppColor.whiteDim
         return sb
     }()
 
     private let tableView: UITableView = {
         let tv = UITableView()
-        tv.backgroundColor = .clear
-        tv.separatorColor = UIColor.white.withAlphaComponent(0.15)
+        tv.backgroundColor = AppColor.clear
+        tv.separatorColor = AppColor.whiteOverlay
         tv.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
         return tv
     }()
 
     private let activityIndicator: UIActivityIndicatorView = {
         let ai = UIActivityIndicatorView(style: .medium)
-        ai.color = .white
+        ai.color = AppColor.white
         ai.hidesWhenStopped = true
         return ai
     }()
@@ -61,7 +61,7 @@ class SearchViewController: UIViewController, Routing {
     // MARK: - Setup
 
     private func setupViews() {
-        view.backgroundColor = UIColor(red: 38/255, green: 33/255, blue: 113/255, alpha: 0.97)
+        view.backgroundColor = AppColor.primaryBlur
 
         view.addSubview(searchBar)
         view.addSubview(tableView)
@@ -122,8 +122,8 @@ extension SearchViewController: UITableViewDataSource, UITableViewDelegate {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         let location = viewModel.results[indexPath.row]
 
-        cell.backgroundColor = .clear
-        cell.textLabel?.textColor = .white
+        cell.backgroundColor = AppColor.clear
+        cell.textLabel?.textColor = AppColor.white
         cell.textLabel?.text = [location.name, location.region, location.country]
             .compactMap { $0 }
             .joined(separator: ", ")
