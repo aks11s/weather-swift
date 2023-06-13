@@ -8,6 +8,8 @@ class LocationsViewController: UIViewController, Routing, UIGestureRecognizerDel
 
     // MARK: - UI
 
+    private let backgroundImageView = UIImageView()
+
     private let gradientLayer: CAGradientLayer = {
         let g = CAGradientLayer()
         g.colors = [
@@ -135,6 +137,13 @@ class LocationsViewController: UIViewController, Routing, UIGestureRecognizerDel
     // MARK: - Setup
 
     private func setupViews() {
+        // Background image — выбор по времени суток
+        backgroundImageView.image = UIImage(named: TimeTheme.backgroundImageName())
+        backgroundImageView.contentMode = .scaleAspectFill
+        backgroundImageView.clipsToBounds = true
+        view.addSubview(backgroundImageView)
+        view.sendSubviewToBack(backgroundImageView)
+
         view.layer.insertSublayer(gradientLayer, at: 0)
 
         scrollView.showsVerticalScrollIndicator = false
@@ -160,6 +169,8 @@ class LocationsViewController: UIViewController, Routing, UIGestureRecognizerDel
     }
 
     private func setupLayout() {
+        backgroundImageView.snp.makeConstraints { $0.edges.equalToSuperview() }
+
         scrollView.snp.makeConstraints { $0.edges.equalToSuperview() }
         contentView.snp.makeConstraints { make in
             make.edges.equalTo(scrollView.contentLayoutGuide)

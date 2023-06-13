@@ -89,7 +89,8 @@ class MainWeatherViewController: UIViewController, Routing {
     private func setupViews() {
         view.backgroundColor = AppColor.black
 
-        // Background photo
+        // Background photo — выбор по времени суток
+        backgroundImageView.image = UIImage(named: TimeTheme.backgroundImageName())
         backgroundImageView.contentMode = .scaleAspectFill
         backgroundImageView.clipsToBounds = true
         view.addSubview(backgroundImageView)
