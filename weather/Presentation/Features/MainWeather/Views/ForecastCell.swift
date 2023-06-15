@@ -2,9 +2,6 @@ import UIKit
 import SnapKit
 
 class ForecastCell: UICollectionViewCell {
-    // Figma: column layout, items top-to-bottom:
-    // "Wed 16" (14pt) → icon (40×40) → "22º" (16pt) → "1-5 km/h" (10pt)
-    // Color: #ECECEC per Figma fill_Z39B6L
 
     private let stackView = UIStackView()
     private let dayDateLabel = UILabel()
@@ -22,8 +19,8 @@ class ForecastCell: UICollectionViewCell {
     }
 
     private func setupCell() {
-        // No individual background — shared blur container handles it
-        contentView.backgroundColor = .clear
+        // Фон задаётся родительским контейнером с блюром
+        contentView.backgroundColor = AppColor.clear
 
         stackView.axis = .vertical
         stackView.alignment = .center
@@ -34,13 +31,11 @@ class ForecastCell: UICollectionViewCell {
             make.centerX.equalToSuperview()
         }
 
-        // "Wed 16" — Roboto Regular 14pt, #ECECEC
         dayDateLabel.font = UIFont.systemFont(ofSize: 14, weight: .regular)
         dayDateLabel.textColor = AppColor.forecastText
         dayDateLabel.textAlignment = .center
         stackView.addArrangedSubview(dayDateLabel)
 
-        // Weather icon — 40×40
         weatherIconView.tintColor = AppColor.forecastText
         weatherIconView.contentMode = .scaleAspectFit
         stackView.addArrangedSubview(weatherIconView)
@@ -48,12 +43,10 @@ class ForecastCell: UICollectionViewCell {
             make.width.height.equalTo(40)
         }
 
-        // Temperature — Roboto Regular 16pt, #ECECEC
         tempLabel.font = UIFont.systemFont(ofSize: 16, weight: .regular)
         tempLabel.textColor = AppColor.forecastText
         stackView.addArrangedSubview(tempLabel)
 
-        // Wind — Roboto Regular 10pt, 2 lines, #ECECEC
         windLabel.font = UIFont.systemFont(ofSize: 10, weight: .regular)
         windLabel.textColor = AppColor.forecastText
         windLabel.textAlignment = .center
@@ -67,7 +60,7 @@ class ForecastCell: UICollectionViewCell {
         let dateFmt = DateFormatter()
         dateFmt.dateFormat = "dd"
 
-        // "Wed 16" on one line per Figma
+        // День и число в одну строку
         dayDateLabel.text = "\(dayFmt.string(from: daily.date)) \(dateFmt.string(from: daily.date))"
         tempLabel.text = "\(daily.maxTemp)º"
         windLabel.text = String(format: "%.0f\nkm/h", daily.maxWindSpeed)

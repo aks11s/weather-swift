@@ -1,6 +1,6 @@
 import Foundation
 
-/// Маппинг WMO weather codes → описание и SF Symbol
+/// Погодное условие — преобразует код WMO в текстовое описание и иконку
 enum WeatherCondition {
     case clearSky
     case mainlyClear

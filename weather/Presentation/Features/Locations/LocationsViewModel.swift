@@ -26,7 +26,7 @@ class LocationsViewModel {
 
         Task { @MainActor in
             do {
-                // Параллельный fetch для всех локаций
+                // Загружаем погоду для всех городов параллельно
                 let weathers = try await withThrowingTaskGroup(of: Weather.self) { group in
                     for location in locations {
                         group.addTask { try await self.repository.fetchWeather(for: location) }

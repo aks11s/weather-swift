@@ -27,7 +27,7 @@ class SearchViewModel {
         }
 
         searchTask = Task { @MainActor in
-            // Debounce 400ms
+            // Ждём 400мс — если пользователь ещё печатает, предыдущий запрос отменится
             try? await Task.sleep(nanoseconds: 400_000_000)
             guard !Task.isCancelled else { return }
 

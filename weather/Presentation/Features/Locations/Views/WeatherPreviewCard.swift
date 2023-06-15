@@ -1,12 +1,11 @@
 import UIKit
 import SnapKit
 
-/// Карточка локации — Figma "Weather Preview Card" (345×153)
+/// Карточка с кратким превью погоды для выбранного города
 class WeatherPreviewCard: UIView {
 
     // MARK: - UI
 
-    // Background (borderRadius: 24)
     private let blurView: UIView = {
         let view = UIView()
         view.backgroundColor = AppColor.cardBackground
@@ -15,7 +14,7 @@ class WeatherPreviewCard: UIView {
         return view
     }()
 
-    // City — Roboto Bold 24pt, white, x=16 y=16
+    // Название города
     private let cityLabel: UILabel = {
         let l = UILabel()
         l.font = UIFont.systemFont(ofSize: 24, weight: .bold)
@@ -23,7 +22,7 @@ class WeatherPreviewCard: UIView {
         return l
     }()
 
-    // Condition — Roboto Medium 16pt, rgba(255,255,255,0.8), x=16 y=52
+    // Описание погоды
     private let conditionLabel: UILabel = {
         let l = UILabel()
         l.font = UIFont.systemFont(ofSize: 16, weight: .medium)
@@ -31,7 +30,7 @@ class WeatherPreviewCard: UIView {
         return l
     }()
 
-    // Humidity row — x=16 y=93
+    // Ряд с влажностью
     private let humidityStack = UIStackView()
     private let humidityTitleLabel: UILabel = {
         let l = UILabel()
@@ -47,7 +46,7 @@ class WeatherPreviewCard: UIView {
         return l
     }()
 
-    // Wind row — x=16 y=117
+    // Ряд с ветром
     private let windStack = UIStackView()
     private let windTitleLabel: UILabel = {
         let l = UILabel()
@@ -63,7 +62,7 @@ class WeatherPreviewCard: UIView {
         return l
     }()
 
-    // Temperature group — x=203 y=71, 134×57
+    // Блок температуры
     private let tempGroupView = UIView()
     private let temperatureLabel: UILabel = {
         let l = UILabel()
@@ -72,7 +71,7 @@ class WeatherPreviewCard: UIView {
         l.textAlignment = .center
         return l
     }()
-    // ºC — Sen Bold 24pt, absolute x=96.78 y=0 within tempGroup
+    // Знак градуса
     private let celsiusLabel: UILabel = {
         let l = UILabel()
         l.text = "ºC"
@@ -81,7 +80,7 @@ class WeatherPreviewCard: UIView {
         return l
     }()
 
-    // Weather icon — x=273 y=16, 56×56
+    // Иконка погоды
     private let weatherIconView: UIImageView = {
         let iv = UIImageView()
         iv.contentMode = .scaleAspectFit
@@ -109,21 +108,18 @@ class WeatherPreviewCard: UIView {
         addSubview(blurView)
         blurView.snp.makeConstraints { $0.edges.equalToSuperview() }
 
-        // City — x=16 y=16
         addSubview(cityLabel)
         cityLabel.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(16)
             make.left.equalToSuperview().offset(16)
         }
 
-        // Condition — x=16 y=52
         addSubview(conditionLabel)
         conditionLabel.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(52)
             make.left.equalToSuperview().offset(16)
         }
 
-        // Humidity row — x=16 y=93, gap=4
         humidityStack.axis = .horizontal
         humidityStack.spacing = 4
         humidityStack.addArrangedSubview(humidityTitleLabel)
@@ -134,7 +130,6 @@ class WeatherPreviewCard: UIView {
             make.left.equalToSuperview().offset(16)
         }
 
-        // Wind row — x=16 y=117, gap=4
         windStack.axis = .horizontal
         windStack.spacing = 4
         windStack.addArrangedSubview(windTitleLabel)
@@ -145,7 +140,6 @@ class WeatherPreviewCard: UIView {
             make.left.equalToSuperview().offset(16)
         }
 
-        // Temperature group — x=203 y=71, 134×57
         addSubview(tempGroupView)
         tempGroupView.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(71)
@@ -154,7 +148,6 @@ class WeatherPreviewCard: UIView {
             make.height.equalTo(57)
         }
 
-        // Temp number — Roboto Medium 48pt, centered in 134pt
         tempGroupView.addSubview(temperatureLabel)
         temperatureLabel.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(1)
@@ -163,14 +156,12 @@ class WeatherPreviewCard: UIView {
             make.height.equalTo(56)
         }
 
-        // ºC — absolute x=96.78 y=0 within tempGroupView
         tempGroupView.addSubview(celsiusLabel)
         celsiusLabel.snp.makeConstraints { make in
             make.top.equalToSuperview()
-            make.left.equalToSuperview().offset(97) // ≈ 96.78
+            make.left.equalToSuperview().offset(97)
         }
 
-        // Weather icon — x=273 y=16, 56×56
         addSubview(weatherIconView)
         weatherIconView.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(16)

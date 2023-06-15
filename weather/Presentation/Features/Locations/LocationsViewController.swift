@@ -10,6 +10,13 @@ class LocationsViewController: UIViewController, Routing, UIGestureRecognizerDel
 
     private let backgroundImageView = UIImageView()
 
+    private let activityIndicator: UIActivityIndicatorView = {
+        let ai = UIActivityIndicatorView(style: .large)
+        ai.color = AppColor.white
+        ai.hidesWhenStopped = true
+        return ai
+    }()
+
     private let gradientLayer: CAGradientLayer = {
         let g = CAGradientLayer()
         g.colors = [
@@ -146,6 +153,8 @@ class LocationsViewController: UIViewController, Routing, UIGestureRecognizerDel
 
         view.layer.insertSublayer(gradientLayer, at: 0)
 
+        view.addSubview(activityIndicator)
+
         scrollView.showsVerticalScrollIndicator = false
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
@@ -170,6 +179,10 @@ class LocationsViewController: UIViewController, Routing, UIGestureRecognizerDel
 
     private func setupLayout() {
         backgroundImageView.snp.makeConstraints { $0.edges.equalToSuperview() }
+
+        activityIndicator.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+        }
 
         scrollView.snp.makeConstraints { $0.edges.equalToSuperview() }
         contentView.snp.makeConstraints { make in
@@ -209,8 +222,14 @@ class LocationsViewController: UIViewController, Routing, UIGestureRecognizerDel
 
     private func setupBindings() {
         viewModel.stateDidChange = { [weak self] state in
-            if case .loaded(let locations) = state {
+            switch state {
+            case .loading:
+                self?.activityIndicator.startAnimating()
+            case .loaded(let locations):
+                self?.activityIndicator.stopAnimating()
                 self?.renderCards(with: locations)
+            case .error, .idle:
+                self?.activityIndicator.stopAnimating()
             }
         }
     }

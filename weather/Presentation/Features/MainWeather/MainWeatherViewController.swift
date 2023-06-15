@@ -19,27 +19,34 @@ class MainWeatherViewController: UIViewController, Routing {
     private let scrollView = UIScrollView()
     private let contentView = UIView()
 
-    // Header (y=78)
+    private let activityIndicator: UIActivityIndicatorView = {
+        let ai = UIActivityIndicatorView(style: .large)
+        ai.color = AppColor.white
+        ai.hidesWhenStopped = true
+        return ai
+    }()
+
+    // Шапка
     private let pinIconView = UIImageView()
     private let cityLabel = UILabel()
     private let menuButton = UIButton(type: .custom)
 
-    // Date/Updated (y=171, y=227)
+    // Дата и обновление
     private let dateLabel = UILabel()
     private let updatedLabel = UILabel()
 
-    // Main weather block (y=276, column, gap=-8)
+    // Основной блок погоды
     private let weatherIconView = UIImageView()
     private let conditionLabel = UILabel()
     private let temperatureLabel = UILabel()
     private let celsiusLabel = UILabel()
 
-    // Details (y=565)
+    // Детали погоды
     private let humidityView = DetailWeatherView()
     private let windView = DetailWeatherView()
     private let feelsLikeView = DetailWeatherView()
 
-    // Forecast (y=663, shared blur background)
+    // Прогноз
     private let forecastBlurView: UIVisualEffectView = {
         let view = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
         view.layer.cornerRadius = 24
@@ -95,68 +102,68 @@ class MainWeatherViewController: UIViewController, Routing {
         backgroundImageView.clipsToBounds = true
         view.addSubview(backgroundImageView)
 
-        // Darkening overlay — rgba(0,0,0,0.33) per Figma
+        // Тёмный оверлей поверх фото
         darkeningView.backgroundColor = AppColor.blackOverlay
         view.addSubview(darkeningView)
 
-        // Scroll view
+        view.addSubview(activityIndicator)
+
         scrollView.showsVerticalScrollIndicator = false
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
 
-        // Pin icon (location.fill or asset)
+        // Иконка локации
         pinIconView.image = UIImage(named: "icon_location") ?? UIImage(systemName: "location.fill")
         pinIconView.tintColor = AppColor.white
         pinIconView.contentMode = .scaleAspectFit
         contentView.addSubview(pinIconView)
 
-        // City label — Roboto Regular 18pt
+        // Название города
         cityLabel.font = UIFont.systemFont(ofSize: 18, weight: .regular)
         cityLabel.textColor = AppColor.white
         contentView.addSubview(cityLabel)
 
-        // Menu / Add / Cancel button
+        // Кнопка меню / добавить / отмена
         menuButton.tintColor = AppColor.white
         menuButton.addTarget(self, action: #selector(menuTapped), for: .touchUpInside)
         contentView.addSubview(menuButton)
         configureMenuButton()
 
-        // Date — Roboto Medium 40pt
+        // Дата
         dateLabel.font = UIFont.systemFont(ofSize: 40, weight: .medium)
         dateLabel.textColor = AppColor.white
         dateLabel.textAlignment = .center
         contentView.addSubview(dateLabel)
 
-        // Updated — Roboto Light 16pt
+        // Время последнего обновления
         updatedLabel.font = UIFont.systemFont(ofSize: 16, weight: .light)
         updatedLabel.textColor = AppColor.white
         updatedLabel.textAlignment = .center
         contentView.addSubview(updatedLabel)
 
-        // Weather icon — 95×95
+        // Иконка погоды
         weatherIconView.contentMode = .scaleAspectFit
         weatherIconView.tintColor = AppColor.white
         contentView.addSubview(weatherIconView)
 
-        // Condition — Roboto Bold 40pt
+        // Описание погоды
         conditionLabel.font = UIFont.systemFont(ofSize: 40, weight: .bold)
         conditionLabel.textColor = AppColor.white
         conditionLabel.textAlignment = .center
         contentView.addSubview(conditionLabel)
 
-        // Temperature — Roboto Medium 86pt
+        // Температура
         temperatureLabel.font = UIFont.systemFont(ofSize: 86, weight: .medium)
         temperatureLabel.textColor = AppColor.white
         temperatureLabel.textAlignment = .center
         contentView.addSubview(temperatureLabel)
 
-        // ºC — Sen Bold 24pt (mapped to system bold)
+        // Знак градуса
         celsiusLabel.text = "ºC"
         celsiusLabel.font = UIFont.systemFont(ofSize: 24, weight: .bold)
         celsiusLabel.textColor = AppColor.white
         contentView.addSubview(celsiusLabel)
 
-        // Details
         humidityView.configure(icon: "icon_humidity", label: "HUMIDITY", value: "56", unit: "%")
         windView.configure(icon: "icon_wind", label: "WIND", value: "4.63", unit: "km/h")
         feelsLikeView.configure(icon: "icon_feelslike", label: "FEELS LIKE", value: "22", unit: "°")
@@ -164,11 +171,10 @@ class MainWeatherViewController: UIViewController, Routing {
         contentView.addSubview(windView)
         contentView.addSubview(feelsLikeView)
 
-        // Forecast container — blur + overlay
+        // Контейнер прогноза с блюром
         contentView.addSubview(forecastBlurView)
         forecastBlurView.contentView.addSubview(forecastOverlay)
 
-        // Forecast collection view
         forecastCollectionView.backgroundColor = AppColor.clear
         forecastCollectionView.delegate = self
         forecastCollectionView.dataSource = self
@@ -186,6 +192,10 @@ class MainWeatherViewController: UIViewController, Routing {
             make.edges.equalToSuperview()
         }
 
+        activityIndicator.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+        }
+
         scrollView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
@@ -195,7 +205,7 @@ class MainWeatherViewController: UIViewController, Routing {
             make.width.equalTo(scrollView.frameLayoutGuide)
         }
 
-        // MARK: Header — y=78
+        // MARK: - Шапка
         pinIconView.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(78)
             make.left.equalToSuperview().offset(24)
@@ -204,7 +214,7 @@ class MainWeatherViewController: UIViewController, Routing {
 
         cityLabel.snp.makeConstraints { make in
             make.centerY.equalTo(pinIconView)
-            make.left.equalTo(pinIconView.snp.right).offset(4) // 24+32+4=60 ≈ Figma x=60.26
+            make.left.equalTo(pinIconView.snp.right).offset(4)
         }
 
         menuButton.snp.makeConstraints { make in
@@ -214,7 +224,7 @@ class MainWeatherViewController: UIViewController, Routing {
             make.width.greaterThanOrEqualTo(32)
         }
 
-        // MARK: Date — y=171, Updated — y=227
+        // MARK: - Дата и обновление
         dateLabel.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(171)
             make.centerX.equalToSuperview()
@@ -225,8 +235,7 @@ class MainWeatherViewController: UIViewController, Routing {
             make.centerX.equalToSuperview()
         }
 
-        // MARK: Main weather block — y=276, column gap=-8
-        // Order: Icon → Condition → Temperature (gap=-8 between each)
+        // MARK: - Основной блок погоды
         weatherIconView.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(276)
             make.centerX.equalToSuperview()
@@ -241,46 +250,43 @@ class MainWeatherViewController: UIViewController, Routing {
         temperatureLabel.snp.makeConstraints { make in
             make.top.equalTo(conditionLabel.snp.bottom).offset(-8)
             make.centerX.equalToSuperview()
-            make.width.equalTo(134) // Figma: fixed width 134.3
+            make.width.equalTo(134)
         }
 
-        // ºC: absolute x=118, y=10 within Value_temp frame
         celsiusLabel.snp.makeConstraints { make in
             make.top.equalTo(temperatureLabel).offset(10)
             make.left.equalTo(temperatureLabel.snp.left).offset(118)
         }
 
-        // MARK: Details — y=565, height=80
-        // Figma positions within Details frame (left offset 24 from screen):
-        // Humidity x=0, Wind x=150, FeelsLike x=273
+        // MARK: - Детали
         humidityView.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(565)
             make.left.equalToSuperview().offset(24)
-            make.width.equalTo(115)  // 345 / 3
+            make.width.equalTo(115)
             make.height.equalTo(80)
         }
 
         windView.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(565)
-            make.left.equalToSuperview().offset(139)        // 24 + 115
+            make.left.equalToSuperview().offset(139)
             make.width.equalTo(115)
             make.height.equalTo(80)
         }
 
         feelsLikeView.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(565)
-            make.left.equalToSuperview().offset(254)        // 24 + 230
+            make.left.equalToSuperview().offset(254)
             make.width.equalTo(115)
             make.height.equalTo(80)
         }
 
-        // MARK: Forecast — y=663, width=345, height=153
+        // MARK: - Прогноз
         forecastBlurView.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(663)
             make.left.equalToSuperview().offset(24)
             make.width.equalTo(345)
             make.height.equalTo(153)
-            make.bottom.equalToSuperview().offset(-36) // sets contentView height = 852
+            make.bottom.equalToSuperview().offset(-36)
         }
 
         forecastOverlay.snp.makeConstraints { make in
@@ -298,10 +304,12 @@ class MainWeatherViewController: UIViewController, Routing {
         viewModel.stateDidChange = { [weak self] state in
             switch state {
             case .loaded(let weather):
+                self?.activityIndicator.stopAnimating()
                 self?.updateUI(with: weather)
             case .loading:
-                print("Loading...")
+                self?.activityIndicator.startAnimating()
             case .error(let error):
+                self?.activityIndicator.stopAnimating()
                 print("Error: \(error)")
             case .idle:
                 break
