@@ -19,6 +19,10 @@ class SearchViewController: UIViewController, Routing {
         sb.searchTextField.textColor = AppColor.white
         sb.searchTextField.backgroundColor = AppColor.whiteOverlay
         sb.searchTextField.leftView?.tintColor = AppColor.whiteDim
+        sb.searchTextField.attributedPlaceholder = NSAttributedString(
+            string: "Search city...",
+            attributes: [.foregroundColor: AppColor.whiteFaint]
+        )
         return sb
     }()
 

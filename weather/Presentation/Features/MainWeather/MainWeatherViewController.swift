@@ -31,9 +31,8 @@ class MainWeatherViewController: UIViewController, Routing {
     private let cityLabel = UILabel()
     private let menuButton = UIButton(type: .custom)
 
-    // Дата и обновление
+    // Дата
     private let dateLabel = UILabel()
-    private let updatedLabel = UILabel()
 
     // Основной блок погоды
     private let weatherIconView = UIImageView()
@@ -135,12 +134,6 @@ class MainWeatherViewController: UIViewController, Routing {
         dateLabel.textAlignment = .center
         contentView.addSubview(dateLabel)
 
-        // Время последнего обновления
-        updatedLabel.font = UIFont.systemFont(ofSize: 16, weight: .light)
-        updatedLabel.textColor = AppColor.white
-        updatedLabel.textAlignment = .center
-        contentView.addSubview(updatedLabel)
-
         // Иконка погоды
         weatherIconView.contentMode = .scaleAspectFit
         weatherIconView.tintColor = AppColor.white
@@ -224,14 +217,9 @@ class MainWeatherViewController: UIViewController, Routing {
             make.width.greaterThanOrEqualTo(32)
         }
 
-        // MARK: - Дата и обновление
+        // MARK: - Дата
         dateLabel.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(171)
-            make.centerX.equalToSuperview()
-        }
-
-        updatedLabel.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(227)
             make.centerX.equalToSuperview()
         }
 
@@ -250,12 +238,11 @@ class MainWeatherViewController: UIViewController, Routing {
         temperatureLabel.snp.makeConstraints { make in
             make.top.equalTo(conditionLabel.snp.bottom).offset(-8)
             make.centerX.equalToSuperview()
-            make.width.equalTo(134)
         }
 
         celsiusLabel.snp.makeConstraints { make in
-            make.top.equalTo(temperatureLabel).offset(10)
-            make.left.equalTo(temperatureLabel.snp.left).offset(118)
+            make.top.equalTo(temperatureLabel).offset(8)
+            make.left.equalTo(temperatureLabel.snp.right).offset(2)
         }
 
         // MARK: - Детали
@@ -345,10 +332,6 @@ class MainWeatherViewController: UIViewController, Routing {
         let dateFmt = DateFormatter()
         dateFmt.dateFormat = "MMMM dd"
         dateLabel.text = dateFmt.string(from: Date())
-
-        let updatedFmt = DateFormatter()
-        updatedFmt.dateFormat = "M/d/yyyy h:mm a"
-        updatedLabel.text = "Updated as of \(updatedFmt.string(from: weather.updatedAt))"
 
         forecastCollectionView.reloadData()
     }
