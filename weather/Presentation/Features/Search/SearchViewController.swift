@@ -65,7 +65,7 @@ class SearchViewController: UIViewController, Routing {
     // MARK: - Setup
 
     private func setupViews() {
-        view.backgroundColor = AppColor.primaryBlur
+        view.backgroundColor = AppColor.modalBackground
 
         view.addSubview(searchBar)
         view.addSubview(tableView)

@@ -23,6 +23,7 @@ enum AppColor {
     static let black          = UIColor(hex: "#000000")
     static let blackOverlay   = UIColor(hex: "#000000").withAlphaComponent(0.33)
     static let cardBackground = UIColor(hex: "#AAA5A5")
+    static let modalBackground = UIColor(hex: "#AAA5A5").withAlphaComponent(0.9)
     static let forecastOverlay = UIColor(hex: "#535353").withAlphaComponent(0.3)
 
     // MARK: - Actions
